@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Image Caption Generator</title>
+  <meta name="description" content="Enterprise AI image captioning powered by OpenAI vision models." />
+  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="site-header__inner">
+      <div class="brand">
+        <svg class="brand__mark" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <rect x="2" y="6" width="28" height="20" rx="3" stroke="currentColor" stroke-width="2" />
+          <circle cx="16" cy="16" r="5" stroke="currentColor" stroke-width="2" />
+          <circle cx="16" cy="16" r="1.6" fill="currentColor" />
+          <rect x="10" y="3" width="6" height="3" rx="1" fill="currentColor" />
+        </svg>
+        <span class="brand__name">Image Caption Generator</span>
+        <span class="brand__tag">VISION AI</span>
+      </div>
+      <div class="header-actions">
+        <button id="themeToggle" class="icon-btn" type="button" aria-label="Toggle dark mode" title="Toggle dark mode">
+          <svg id="themeIconSun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <circle cx="12" cy="12" r="4" />
+            <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
+          </svg>
+          <svg id="themeIconMoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none">
+            <path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <div id="statusBanner" class="status-banner" role="alert">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v5M12 16h.01"/></svg>
+      <span id="statusBannerText"></span>
+    </div>
+
+    <p class="eyebrow">Computer Vision &middot; Structured Output</p>
+    <h1>Describe any image in seconds</h1>
+    <p class="lede">
+      Upload a photo or capture one with your camera. The vision model analyzes the scene and
+      returns a caption, a detailed description, accessibility-ready alt text, and topic tags.
+    </p>
+
+    <section class="viewfinder" id="viewfinder">
+      <div class="viewfinder__scanline"></div>
+      <div class="viewfinder__zone" id="dropZone">
+        <div class="viewfinder__corner viewfinder__corner--tl"></div>
+        <div class="viewfinder__corner viewfinder__corner--tr"></div>
+        <div class="viewfinder__corner viewfinder__corner--bl"></div>
+        <div class="viewfinder__corner viewfinder__corner--br"></div>
+
+        <div class="viewfinder__placeholder">
+          <svg class="viewfinder__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M4 16l4.6-4.6a2 2 0 0 1 2.8 0L16 16" />
+            <path d="M14 14l1.6-1.6a2 2 0 0 1 2.8 0L20 14" />
+            <rect x="3" y="4" width="18" height="16" rx="2" />
+            <circle cx="8.5" cy="8.5" r="1.5" />
+          </svg>
+          <p class="viewfinder__title">Drop an image, or click to browse</p>
+          <p class="viewfinder__hint">JPEG, PNG, or WEBP &middot; up to 8&nbsp;MB</p>
+        </div>
+        <img id="previewImage" class="viewfinder__preview" alt="" />
+        <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp" />
+      </div>
+      <div class="viewfinder__actions">
+        <button type="button" class="btn" id="browseBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v14M5 10l7-7 7 7"/><path d="M5 21h14"/></svg>
+          Upload image
+        </button>
+        <button type="button" class="btn" id="cameraBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 8l2-3h4l2 3h4a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z"/><circle cx="12" cy="13" r="3.2"/></svg>
+          Use camera
+        </button>
+        <button type="button" class="btn btn-ghost" id="clearBtn" style="display:none">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+          Clear
+        </button>
+      </div>
+    </section>
+
+    <div class="controls">
+      <div class="field">
+        <label for="modeSelect">Mode</label>
+        <select id="modeSelect">
+          <option value="standard" selected>Standard caption</option>
+          <option value="detailed">Detailed description</option>
+          <option value="accessibility">Accessibility mode</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="toneSelect">Tone</label>
+        <select id="toneSelect">
+          <option value="neutral" selected>Neutral</option>
+          <option value="creative">Creative</option>
+          <option value="technical">Technical</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="languageSelect">Language</label>
+        <select id="languageSelect">
+          <option value="en" selected>English</option>
+          <option value="es">Spanish</option>
+          <option value="fr">French</option>
+          <option value="de">German</option>
+          <option value="hi">Hindi</option>
+          <option value="ja">Japanese</option>
+          <option value="pt">Portuguese</option>
+          <option value="ar">Arabic</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="streamToggle">Live preview</label>
+        <div class="checkbox-field" style="padding-top:8px">
+          <input type="checkbox" id="streamToggle" />
+          <span>Stream caption as it's written</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="generate-row">
+      <button type="button" class="btn btn-primary" id="generateBtn" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8Z"/></svg>
+        Generate caption
+      </button>
+      <span id="generateHint" class="checkbox-field">Select an image to get started.</span>
+    </div>
+
+    <section class="results" id="results">
+      <div class="card" id="streamCard" style="display:none">
+        <div class="card__header">
+          <span class="card__label">Live preview</span>
+        </div>
+        <p class="stream-output" id="streamOutput"></p>
+      </div>
+
+      <div class="card">
+        <div class="card__header">
+          <span class="card__label" id="captionLabel">Caption</span>
+          <div class="card__actions">
+            <button type="button" class="btn btn-ghost" data-copy-target="captionText" title="Copy caption">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+              Copy
+            </button>
+            <button type="button" class="btn btn-ghost" id="downloadBtn" title="Download caption">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12M6 11l6 6 6-6"/><path d="M5 21h14"/></svg>
+              Download
+            </button>
+          </div>
+        </div>
+        <p class="caption-text" id="captionText">—</p>
+
+        <div id="detailedBlock" style="display:none; margin-top:16px">
+          <p class="card__label" style="margin-bottom:8px">Detailed description</p>
+          <p class="detail-text" id="detailedText"></p>
+        </div>
+
+        <div id="altBlock" style="margin-top:16px">
+          <p class="card__label" style="margin-bottom:8px">Accessibility alt text</p>
+          <p class="detail-text" id="altText"></p>
+        </div>
+
+        <div class="meta-row" id="tagsRow"></div>
+
+        <div class="confidence">
+          <span>Confidence</span>
+          <div class="confidence__bar"><div class="confidence__fill" id="confidenceFill" style="width:0%"></div></div>
+          <span id="confidenceValue">0%</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-heading">
+      <h2>History</h2>
+      <button type="button" class="btn btn-ghost" id="refreshHistoryBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v6h-6"/></svg>
+        Refresh
+      </button>
+    </div>
+    <div class="history-list" id="historyList">
+      <div class="empty-state">No captions generated yet. Your history will appear here.</div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      Image Caption Generator &middot; built with FastAPI and the OpenAI Responses API &middot;
+      <a href="https://github.com/" target="_blank" rel="noopener">View on GitHub</a>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast" role="status"></div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
